@@ -57,6 +57,7 @@ public:
 		String md5;
 		JSValue res_value;
 		RES res;
+		bool resolving;
 	};
 
 	struct CommonJSModule {

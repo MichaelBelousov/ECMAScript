@@ -559,6 +559,12 @@ JSModuleDef *QuickJSBinder::js_module_loader(JSContext *ctx, const char *module_
 		m = ptr->module;
 	}
 
+	ModuleCache module;
+	module.md5 = FileAccess::get_md5(file);
+	module.flags = MODULE_FLAG_RESOURCE;
+	module.resolving = true;
+	binder->module_cache.set(file, module);
+
 	if (!m) {
 		List<String> extensions;
 		ECMAScriptLanguage::get_singleton()->get_recognized_extensions(&extensions);
@@ -572,7 +578,8 @@ JSModuleDef *QuickJSBinder::js_module_loader(JSContext *ctx, const char *module_
 			if (file.ends_with(EXT_JSON)) {
 				code = "export default " + code;
 			}
-			if (ModuleCache *module = binder->js_compile_module(ctx, code, file, &err)) {
+			if (ModuleCache *compiledModule = binder->js_compile_module(ctx, code, file, &err)) {
+				module.module = compiled->module;
 				m = module->module;
 			}
 		} else { // Try load as Resource
@@ -589,16 +596,12 @@ JSModuleDef *QuickJSBinder::js_module_loader(JSContext *ctx, const char *module_
 			JS_EvalFunction(ctx, func);
 			JSValue val = variant_to_var(ctx, res);
 			JS_SetModuleExport(ctx, m, "default", val);
-
-			ModuleCache module;
-			module.md5 = FileAccess::get_md5(file);
 			module.module = m;
 			module.res = res;
 			module.res->reference(); // Avoid auto release as module don't release automaticly
 			module.res_value = val;
-			module.flags = MODULE_FLAG_RESOURCE;
 			module.module = static_cast<JSModuleDef *>(JS_VALUE_GET_PTR(func));
-			binder->module_cache.set(file, module);
+			module.resolving = false;
 		}
 	}
 
