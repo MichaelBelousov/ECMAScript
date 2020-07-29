@@ -486,6 +486,7 @@ void QuickJSBinder::add_debug_binding_info(JSContext *ctx, JSValueConst p_obj, c
 
 static HashMap<String, String> resolve_path_cache;
 
+// TODO: rename to commonjs
 static String resolve_commanjs_module_file(const String &file, bool allow_node_module = false) {
 	if (const String *ptr = resolve_path_cache.getptr(file)) {
 		return *ptr;

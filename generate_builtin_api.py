@@ -23,6 +23,7 @@ BUILTIN_CLASSES = [
 	"PoolColorArray",
 ]
 
+# can this be generated from docs/xml of optional arguments?
 MAX_CONSTRUCTOR_ARGC = {
 	'Vector2': 2,
 	'Rect2': 4,
@@ -331,6 +332,8 @@ OPERATOR_METHODS = {
 	]
 }
 
+# TODO: fix spelling
+# XXX: why not use python's actual templating?
 def apply_parttern(template, values):
 	for key in values:
 		template = template.replace( '${' + key + '}', values[key])
